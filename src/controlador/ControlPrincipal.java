@@ -33,6 +33,7 @@ public class ControlPrincipal extends ControlAbs{
 	public Data ejecutaComando(String c, Data d, Data d2) {
 		switch(c) {
 		case Comandos.INICIA:
+			vent.setBounds(0, 0, 500, 600);
 			vent.setLocationRelativeTo(null);
 			vent.setVisible(true);
 			

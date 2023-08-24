@@ -1,23 +1,29 @@
 package gui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
+import java.io.File;
+import java.io.IOException;
 
-import javax.swing.BorderFactory;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.TitledBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
+import javax.swing.text.Document;
+
+import org.apache.pdfbox.pdmodel.PDDocument;
 
 import controlador.Comandos;
 
@@ -25,71 +31,86 @@ import controlador.Comandos;
 @SuppressWarnings("serial")
 public class Ventana extends VentanaAGeneral{
 	
-	JPanel panelCent;
-	JLabel paginas;
-	JTextArea pag;
-	JButton bBuscar;
-	JScrollPane sP;
+	JPanel principal;
+	JLabel nombre;
+	JButton insertar, selecArch;
+	JComboBox<String> combo;
+	JScrollPane preview;
+	JFileChooser file;
 	GridBagConstraints rest;
 	
 	
 	public Ventana() {
-		super("<title>");
+		super("PDF o imagenes en base de datos");
 		
 		try {
 			UIManager.setLookAndFeel(new NimbusLookAndFeel());
 		} catch (UnsupportedLookAndFeelException e) {
 			e.printStackTrace();
 		}
-		this.setExtendedState(MAXIMIZED_BOTH);
+		//this.setExtendedState(MAXIMIZED_BOTH);
 		rest = new GridBagConstraints();
+		rest.fill = GridBagConstraints.HORIZONTAL;
+		rest.weightx=1.0;
+		rest.weighty=1.0;
 		
 		//CREAR PANELES
+		principal = new JPanel();
+		principal.setLayout(new GridBagLayout());
 		
-		//EJEMPLO DE PANEL CON RESTRICCIONES
-		JPanel maxmin = new JPanel();
-		maxmin.setBorder (BorderFactory.createTitledBorder (BorderFactory.createEtchedBorder (),"Maximos y minimos del histograma",TitledBorder.CENTER,TitledBorder.TOP));
-		maxmin.setLayout(new GridBagLayout());
+		//CREANDO ELEMENTOS
+		//FILE CHOOSER, PARA PODER SELECCIONAR ELEMENTOS
+		file = new JFileChooser();
+		file.setFileFilter(new FileNameExtensionFilter ("PDF", "pdf", "png","PNG", "jpg", "JPG", "tif", "TIF", "tiff", "TIFF", "avif", "AVIF", "jpeg", "JPEG", "bmp", "BMP", "ppm", "PPM"));
 		
-		JButton max = new JButton("Picos significativos del histograma");
-		max.setActionCommand(Comandos.INICIA);
-		max.addActionListener(this);
+		selecArch = new JButton("Seleccionar archivo");
+		selecArch.addActionListener(this);
+		selecArch.setActionCommand(Comandos.SELECCIONAR);
 		rest.gridx = 0;
 		rest.gridy = 0;
+		rest.gridwidth = 2;
+		rest.gridheight = 1;
+		principal.add(selecArch, rest);
+		//FALTACOMBOBOX****
+		combo = new JComboBox<String>();
+		rest.gridx = 0;
+		rest.gridy = 1;
+		rest.gridwidth = 2;
+		rest.gridheight = 1;
+		principal.add(combo, rest);
+		
+		
+		nombre = new JLabel("Aquí aparecerá el nombre del archivo");
+		rest.gridx = 0;
+		rest.gridy = 2;
+		rest.gridwidth = 2;
+		rest.gridheight = 1;
+		principal.add(nombre, rest);
+		
+		preview = new JScrollPane(null, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,//REEMPLAZAR EL AREA POR EL ELEMENTO PARA VER
+	            JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		rest.gridx = 0;
+		rest.gridy = 3;
+		rest.gridwidth = 2;
+		rest.gridheight = 4;
+		rest.fill = GridBagConstraints.BOTH;
+		principal.add(preview, rest);
+		rest.fill = GridBagConstraints.HORIZONTAL;
+		
+		insertar = new JButton("Insertar");
+		insertar.addActionListener(this);
+		insertar.setActionCommand(Comandos.INSERTAR);
+		rest.gridx = 1;
+		rest.gridy = 7;
 		rest.gridwidth = 1;
 		rest.gridheight = 1;
-		maxmin.add(max, rest);
-		
-		//PANEL CENTRAL
-		panelCent = new JPanel(new GridLayout(1,2));
-		panelCent.setBorder(new EmptyBorder(5,5,5,5));
-		panelCent.setBackground(Color.BLACK);
-
-		//CREAR ETIQUETAS
-		paginas = new JLabel("PÁGINAS:");
-		
-		//CREAR TEXTAREAS
-		pag = new JTextArea("");
-			
-		//CREAR BOTON DE MAPEAR
-		bBuscar = new JButton("Mapear página");
-		bBuscar.setActionCommand(controlador.Comandos.INICIA);//CREAR Y CAMBIAR COMANDO
-		bBuscar.addActionListener(this);
-		
-		//CREAR SCROLLS
-		sP = new JScrollPane(pag, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-	            JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);//CAMBIAR EL SETEO DEL TEXT AREA
-		
-		
-		//AGREAGAR LOS ELEMENTOS A LOS PANELES
-		//PANEL CENTRAL
-			panelCent.add(sP);
+		principal.add(insertar, rest);
 		
 		//AGREGAR LOS PANELES A LA VENTANA
-		this.add(panelCent, BorderLayout.CENTER);
+		this.add(principal, BorderLayout.CENTER);
 		
 	
-		//this.setResizable(false);
+		this.setResizable(true);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 	}//FIN CONSTRUCTOR DE LA VENTANA
 
@@ -97,7 +118,30 @@ public class Ventana extends VentanaAGeneral{
 public void actionPerformed(ActionEvent e) {
 		
 	switch (e.getActionCommand()) {//CASO DE LOS COMANDOS (BOTONES)
-	case "":
+	case Comandos.SELECCIONAR:
+		file.showOpenDialog(this);
+		String ruta = file.getSelectedFile().getPath();
+		nombre.setText(file.getSelectedFile().getName());
+		System.out.print(file.getSelectedFile().getName());
+		this.repaint();
+		
+		/*if(ruta.indexOf("pdf")!=-1) {//ES PDF
+			try {
+				Document document = PDDocument.load(file.getSelectedFile());
+				Image pdf = ImageIO.read(file.getSelectedFile());
+				JLabel etq = new JLabel();
+				etq.setIcon(new ImageIcon(pdf));
+				preview.add(etq);
+				this.repaint();
+				
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}else {//ES IMAGEN
+			
+		}//FIN ES IMAGEN*/
+		
+		
 		
 		break;		
 		}//FIN SWITCH
