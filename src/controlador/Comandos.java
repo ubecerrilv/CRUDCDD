@@ -5,5 +5,6 @@ public class Comandos {
 	public static final String 
 		INICIA = "inicia",
 		SELECCIONAR = "selecionar", 
-		INSERTAR = "insertar";
+		INSERTAR = "insertar",
+		CONSULTAR = "consultar";
 }
