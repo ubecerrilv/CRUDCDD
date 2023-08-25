@@ -51,7 +51,7 @@ public class Principal {
 	
 	public static Connection getDBConnection() 
     {
-        String url          = "jdbc:derby://localhost:1527/BLOBCollection;create=false";//CORREGIR XD
+        String url= "jdbc:derby://localhost:1527/BLOBCollection;create=false";//CORREGIR XD
         try
         {
             Connection conn = DriverManager.getConnection(url);

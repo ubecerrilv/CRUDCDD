@@ -38,7 +38,7 @@ public class Ventana extends VentanaAGeneral{
 	BufferedImage imagenAct ;
 	
 	JPanel principal, arriba, abajo, der, iz;
-	JLabel nombre, PDF, etqdes, etqdesC;
+	JLabel nombre, PDF, etqdes, etqdesC, autores;
 	JTextArea clave, des, desC;
 	JButton insertar, selecArch, consultar;
 	JComboBox<String> combo;
@@ -48,7 +48,7 @@ public class Ventana extends VentanaAGeneral{
 	
 	
 	public Ventana() {
-		super("PDF o imagenes en base de datos");
+		super("Imagenes en base de datos");
 		
 		try {
 			UIManager.setLookAndFeel(new NimbusLookAndFeel());
@@ -190,9 +190,11 @@ public class Ventana extends VentanaAGeneral{
 		//CREANDO ELEMENTOS
 		//FILE CHOOSER, PARA PODER SELECCIONAR ELEMENTOS
 		file = new JFileChooser();
-		file.setFileFilter(new FileNameExtensionFilter ("PDF", "pdf", "png","PNG", "jpg", "JPG", "tif", "TIF", "tiff", "TIFF", "avif", "AVIF", "jpeg", "JPEG", "bmp", "BMP", "ppm", "PPM"));
+		file.setFileFilter(new FileNameExtensionFilter ("png","PNG", "jpg", "JPG", "tif", "TIF", "tiff", "TIFF", "avif", "AVIF", "jpeg", "JPEG", "bmp", "BMP", "ppm", "PPM"));
 		
-		//CREAR ETIQUETA PARA MOSTRAR LOS DOCUMENTOS
+		//CREAR ETIQUETA PARA LOS AUTORES
+		autores = new JLabel("<html><h3><center><b>Creado por: Ulises Becerril Valdes y Octavio Daniel Rodriguez Gonzalez</b></center></h3></html>");
+		this.add(autores, BorderLayout.NORTH);
 		
 		
 		//AGREGAR LOS PANELES A LA VENTANA
@@ -211,19 +213,15 @@ public void actionPerformed(ActionEvent e) {
 		file.showOpenDialog(this);
 		ruta = file.getSelectedFile().getPath();
 		nombre.setText(file.getSelectedFile().getName());
-		
-		if(ruta.indexOf("pdf")!=-1) {//ES PDF
-			
-		}else {//ES IMAGEN
-			try {
-				imagenAct = ImageIO.read(new File(file.getSelectedFile().getPath()));
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-			Icon icono = new ImageIcon(imagenAct.getScaledInstance(PDF.getWidth(), PDF.getHeight(), DO_NOTHING_ON_CLOSE));
-			PDF.setIcon(icono);
-			this.repaint();
-		}//FIN ES IMAGEN
+	
+		try {
+			imagenAct = ImageIO.read(new File(file.getSelectedFile().getPath()));
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		Icon icono = new ImageIcon(imagenAct.getScaledInstance(PDF.getWidth(), PDF.getHeight(), DO_NOTHING_ON_CLOSE));
+		PDF.setIcon(icono);
+		this.repaint();
 		
 		des.setText("");
 		desC.setText("");
