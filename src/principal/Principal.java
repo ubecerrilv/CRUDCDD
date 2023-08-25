@@ -40,6 +40,7 @@ public class Principal {
 										
 			//CONTROL DE LA VENTANA
 			Vent.setControl(CV);
+			Vent.llenar();
 					
 					
 			//INICIA EL PROGRAMA
@@ -50,14 +51,11 @@ public class Principal {
 	
 	public static Connection getDBConnection() 
     {
-        String url          = "jdbc:oracle:thin:@//187.188.66.250:1521/orcl";
-        //String url = "jdbc:oracle:thin:@//192.168.1.117:1521/orcl";
-        String username     = "EXAMEN";
-        String password     = "oracle1" ;
+        String url          = "jdbc:derby://localhost:1527/BLOBColletion;create=false";//CORREGIR XD
         try
         {
-            Connection conn = DriverManager.getConnection(url, username, password);
-            System.out.println("Conectado ... "+ conn);
+            Connection conn = DriverManager.getConnection(url);
+            JOptionPane.showMessageDialog(null, "Conectado exitosamente");
             return conn;
         }
         catch (SQLException e)

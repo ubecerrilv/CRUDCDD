@@ -6,5 +6,6 @@ public class Comandos {
 		INICIA = "inicia",
 		SELECCIONAR = "selecionar", 
 		INSERTAR = "insertar",
-		CONSULTAR = "consultar";
+		CONSULTAR = "consultar", 
+		NOMBRES  = "obtenernombres";
 }

@@ -12,12 +12,16 @@ public class ControlVPrincipal extends ControlAbs {
 		switch(c) {
 		case Comandos.INSERTAR:
 			Imagen img =(Imagen)d;
+			
 			return dao.inserta(img);
 			
 			
 		case Comandos.CONSULTAR:
 			Imagen img2 = (Imagen)d;
 			return dao.consulta(img2);
+			
+		case Comandos.NOMBRES:
+			return dao.obtenerNombres();
 			
 		}
 		

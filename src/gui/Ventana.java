@@ -1,18 +1,18 @@
 package gui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -44,6 +44,7 @@ public class Ventana extends VentanaAGeneral{
 	JComboBox<String> combo;
 	JFileChooser file;
 	GridBagConstraints rest;
+	String ruta;
 	
 	
 	public Ventana() {
@@ -116,7 +117,9 @@ public class Ventana extends VentanaAGeneral{
 		abajo.setBorder (BorderFactory.createTitledBorder (BorderFactory.createEtchedBorder (),"Consultar documento",TitledBorder.CENTER,TitledBorder.TOP));
 		abajo.setLayout(new GridBagLayout());
 			//ELEMENTOS DEL PANEL DE ABAJO
+			//ELEMENTO TEMPORAL PARA EL COMBO
 			combo = new JComboBox<String>();
+			//combo.setModel(null);
 			rest.gridx = 0;
 			rest.gridy = 0;
 			rest.gridwidth = 2;
@@ -206,9 +209,8 @@ public void actionPerformed(ActionEvent e) {
 	case Comandos.SELECCIONAR:
 		
 		file.showOpenDialog(this);
-		String ruta = file.getSelectedFile().getPath();
+		ruta = file.getSelectedFile().getPath();
 		nombre.setText(file.getSelectedFile().getName());
-		System.out.print(file.getSelectedFile().getName());
 		
 		if(ruta.indexOf("pdf")!=-1) {//ES PDF
 			
@@ -232,13 +234,14 @@ public void actionPerformed(ActionEvent e) {
 	case Comandos.INSERTAR:
 		
 		if(des.getText().compareToIgnoreCase("")!=0) { //O EL ARCHIVO ES NULO**
-			des.setText("");
-			desC.setText("");
-			clave.setText("Llave primaria: ");
-			nombre.setText("No haz seleccionado ningún archivo");
-			
 			//LOGICA PARA INSERTAR EN LA BASE
-			Imagen img = new Imagen();//CREAR LA IMAGEN CON LOS CAMPOS ADECUADOS
+			Imagen img = new Imagen();
+			//CREAR LA IMAGEN CON LOS CAMPOS ADECUADOS
+			img.setRuta(ruta);
+			img.setDescripcion(des.getText());
+			img.setNombre(file.getSelectedFile().getName().substring(0,file.getSelectedFile().getName().indexOf(".")));
+			
+			
 			Imagen res = (Imagen)this.control.ejecutaComando(Comandos.INSERTAR, img, null);
 			
 			if (res != null) {
@@ -249,6 +252,14 @@ public void actionPerformed(ActionEvent e) {
 				JOptionPane.showMessageDialog(this, "Error al insertar ):");
 			}
 			
+			//ACTUALIZAR LISTA
+			llenar();
+			//LIMPIAR
+			des.setText("");
+			desC.setText("");
+			clave.setText("Llave primaria: ");
+			nombre.setText("No haz seleccionado ningún archivo");
+			
 		}else {
 			JOptionPane.showMessageDialog(this, "Ingresa una descripción para la imagen");
 		}
@@ -258,10 +269,17 @@ public void actionPerformed(ActionEvent e) {
 	case Comandos.CONSULTAR:
 		//LOGICA PARA CONSULTAR UNA IMAGEN
 		Imagen imagenI = new Imagen();//CREAR IMAGEN INCOMPLETA
+		imagenI.setNombre(combo.getSelectedItem().toString().substring(combo.getSelectedItem().toString().indexOf(".")+2,combo.getSelectedItem().toString().length()));
 		Imagen respuesta = (Imagen)this.control.ejecutaComando(Comandos.CONSULTAR, imagenI, null);//REGRESA IMAGEN COMPLETA
 		
 		if(respuesta != null) {
-			//USAR LA IMAGEN COMPLETA PARA LLENAR LOS DATOS
+			Image original = respuesta.getIcono().getImage();
+			Image nueva = original.getScaledInstance(PDF.getWidth(), PDF.getHeight(), DO_NOTHING_ON_CLOSE);
+			
+			this.PDF.setIcon(new ImageIcon(nueva));
+			this.clave.setText("Lave primaria: "+respuesta.getLP());
+			this.desC.setText(respuesta.getDescripcion());
+			this.repaint();
 		}else {
 			JOptionPane.showMessageDialog(this, "Error en la consulta ):");
 		}
@@ -271,5 +289,10 @@ public void actionPerformed(ActionEvent e) {
 		break;
 		}//FIN SWITCH
 	}//FIN ACTION
+
+public void llenar() {
+	Imagen aux = (Imagen)this.control.ejecutaComando(Comandos.NOMBRES, null, null);
+	this.combo.setModel(new DefaultComboBoxModel<>(aux.getNombres()));
+}
 	
 }//FIN CLASE VENTANA
